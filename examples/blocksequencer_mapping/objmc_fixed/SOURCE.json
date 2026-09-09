@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/Ethanout/objmc",
+  "issue": "https://github.com/Godlander/objmc/issues/118",
+  "pull_request": "https://github.com/Godlander/objmc/pull/117",
+  "commit": "5252a36f2d2f0f9971584af9100d77748a914961",
+  "local_patches": [
+    "accept_texture_markers_78_and_79",
+    "head_carrier_marker_at_header_pixel_7",
+    "head_carrier_keeps_position_without_subgroup_broadcast",
+    "head_carrier_uses_east_normal_for_yaw_at_vertical_pitch",
+    "head_carrier_bypasses_projection_based_hand_detection"
+  ]
+}

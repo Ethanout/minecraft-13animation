@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.temp/
+output/
+input/
+backups/
+.env
+.env.*
+*.log
+/*.mapping.json
+/tutorial_buck_mapping.json
+/examples/blocksequencer_mapping/example_sources/frames.json
