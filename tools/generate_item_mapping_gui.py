@@ -22,6 +22,14 @@ from pack_workflow import changed_files, install_files, resource_file, validate_
 GENERATOR = Path(__file__).with_name("generate_item_mapping.py")
 
 
+def project_directory() -> Path:
+    return Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent.parent
+
+
+def asset_directory() -> Path:
+    return Path(sys._MEIPASS) if getattr(sys, "frozen", False) else project_directory()
+
+
 @dataclass(frozen=True)
 class SequenceFrame:
     label: str
@@ -181,10 +189,10 @@ class MappingWindow:
         self.firstperson_prefix = tk.StringVar(value="demo:item")
         self.firstperson_path = tk.StringVar()
         self.thirdperson_path = tk.StringVar()
-        project_root = Path(__file__).resolve().parent.parent
+        project_root = project_directory()
         self.output_dir = tk.StringVar(value=str(project_root / "output" / "resourcepack"))
-        bundled_objmc = Path(__file__).parent.parent / "examples" / "blocksequencer_mapping" / "objmc_fixed" / "objmc.py"
-        bundled_texture = Path(__file__).parent.parent / "examples" / "blocksequencer_mapping" / "example_sources" / "thirdperson.png"
+        bundled_objmc = asset_directory() / "examples" / "blocksequencer_mapping" / "objmc_fixed" / "objmc.py"
+        bundled_texture = asset_directory() / "examples" / "blocksequencer_mapping" / "example_sources" / "thirdperson.png"
         self.objmc_script = tk.StringVar(value=str(bundled_objmc) if bundled_objmc.is_file() else "")
         self.objmc_texture = tk.StringVar(value=str(bundled_texture) if bundled_texture.is_file() else "")
         self.resourcepack_root = tk.StringVar()
@@ -513,7 +521,7 @@ class MappingWindow:
             messagebox.showerror("生成失败", str(error))
 
     def next_output_dir(self) -> Path:
-        base = Path(__file__).resolve().parent.parent / "output"
+        base = project_directory() / "output"
         name = re.sub(r"[^a-zA-Z0-9_.-]+", "_", self.item.get().strip() or "animation")
         pattern = re.compile(re.escape(name) + r"_(\d+)$")
         numbers = [int(match.group(1)) for child in base.iterdir()
@@ -574,7 +582,7 @@ class MappingWindow:
                 shutil.copytree(source_dir, destination, dirs_exist_ok=True)
 
     def clear_output(self) -> None:
-        output_root = Path(__file__).resolve().parent.parent / "output"
+        output_root = project_directory() / "output"
         if not output_root.exists():
             self.status.set("生成历史为空。")
             return
@@ -600,6 +608,8 @@ class MappingWindow:
 
     def run_generator(self, manifest_path: Path, output_dir: Path, objmc_script: Path, texture: Path, template: str, directory: str) -> None:
         command = [sys.executable, str(GENERATOR), str(manifest_path), "--output", str(output_dir), "--model-template", template, "--model-directory", directory]
+        if getattr(sys, "frozen", False):
+            command[1] = "--generate"
         if objmc_script:
             command.extend(["--objmc-script", str(objmc_script), "--objmc-texture", str(texture)])
         try:

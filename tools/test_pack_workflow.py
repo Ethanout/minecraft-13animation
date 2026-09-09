@@ -70,6 +70,22 @@ class PackWorkflowTests(unittest.TestCase):
         self.assertEqual([node["index"] for node in composite["models"]], [0, 1])
         self.assertEqual([node["entries"][0]["threshold"] for node in composite["models"]], [1000, 1000])
 
+    def test_dispatch_holds_model_until_next_threshold(self):
+        from generate_item_mapping import FrameSpec, dispatch_node
+        frames = [FrameSpec(value, f"demo:frame_{value}", None, None) for value in (1000, 1002)]
+        node = dispatch_node(frames, [frame.firstperson_model for frame in frames], index=1)
+        self.assertEqual(len(node["entries"]), 2)
+
+        def selected(value):
+            return next((entry["model"] for entry in reversed(node["entries"])
+                         if value >= entry["threshold"]), node["fallback"])
+
+        self.assertEqual(selected(999), {"type": "minecraft:empty"})
+        for value in (1000, 1000.5, 1001, 1001.99):
+            self.assertEqual(selected(value)["model"], "demo:frame_1000")
+        for value in (1002, 1002.5, 2000):
+            self.assertEqual(selected(value)["model"], "demo:frame_1002")
+
 
 if __name__ == "__main__":
     unittest.main()

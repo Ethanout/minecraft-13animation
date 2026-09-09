@@ -8,6 +8,9 @@ input/
 backups/
 .env
 .env.*
+build/
+dist/
+*.spec
 *.log
 /*.mapping.json
 /tutorial_buck_mapping.json

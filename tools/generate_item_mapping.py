@@ -200,12 +200,6 @@ def dispatch_node(frames: list[FrameSpec], model_paths: list[str], index: int = 
                 "model": model_node(model_path),
             }
         )
-        entries.append(
-            {
-                "threshold": frame.custom_model_data + 0.5,
-                "model": {"type": "minecraft:empty"},
-            }
-        )
     return {
         "type": "minecraft:range_dispatch",
         "property": "minecraft:custom_model_data",
@@ -311,6 +305,8 @@ def run_objmc(
         "time",
         "time",
     ]
+    if getattr(sys, "frozen", False):
+        command.insert(1, "--objmc")
     subprocess.run(command, check=True)
 
     with model_path.open("r", encoding="utf-8") as stream:
